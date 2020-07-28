@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<!--압도 정보 참고-->
+<!--https://api.neople.co.kr/df/servers/cain/characters?characterName=%EC%95%95%EB%8F%84&apikey=u24sm4DgTGNKceFknyhar93DXxuHX9pN-->
+<!--https://api.neople.co.kr/df/servers/cain/characters/0371060bc18b58a0da2a6f61f79f2e35/status?apikey=u24sm4DgTGNKceFknyhar93DXxuHX9pN-->
+
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>던파 단기 수익창출 웹 제작</title>
+    <!-- JQuery를 import 합니다 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+        div.question-box {
+            color: white;
+            margin: 10px 0 20px 0;
+            background-image: url("https://i.ytimg.com/vi/uWLPVqP-Sqo/maxresdefault.jpg");
+            background-position: center;
+        }
+
+        table {
+            border: 1px solid;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            padding: 10px;
+            border: 1px solid;
+        }
+
+        .background-center {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .length-control {
+            margin-left: 100px;
+            margin-right: 100px;
+            border: 50px;
+        }
+
+        .size-control {
+            width: 500px;
+            border: 20px;
+        }
+
+        table {font-size: 10pt;}
+
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            $("#stat_table").hide();
+        });
+
+        function serverID(val) {
+            sel = parseInt(val)
+            if(sel === 1) {
+                return "cain";
+            }
+            if(sel === 2) {
+                return "diregie";
+            }
+            if(sel === 3) {
+                return "siroco";
+
+            }if(sel === 4) {
+                return "prey";
+            }
+            if(sel === 5) {
+                return "casillas";
+            }
+            if(sel === 6) {
+                return "hilder";
+            }
+            if(sel === 7) {
+                return "anton";
+            }
+            if(sel === 8) {
+                return "bakal";
+            }
+        }
+
+        function showCharInfo() {
+            $('#df-char').empty();
+            $('#df-status').empty();
+
+            let serName = $('#server-name').val();
+            let charName = $('#char-name').val();
+            let charEncode = encodeURIComponent(charName);
+            if(serName === '' && charName === ''){
+                alert('서버명과 캐릭터명을 전부 입력하세요.')
+            }
+            let dfurl = "https://cors-anywhere.herokuapp.com/https://api.neople.co.kr/df/servers/" + serverID(serName) +
+                "/characters?apikey=u24sm4DgTGNKceFknyhar93DXxuHX9pN&characterName=" + charEncode
+
+            $.ajax({
+                type: "GET",
+                url: dfurl,
+                data: {},
+                success: (response) => {
+                    let charInfo = response["rows"];
+                    let charId = charInfo[0]['characterId']
+                    let charServer = charInfo[0]['serverId']
+
+
+                    let charImg = "https://img-api.neople.co.kr/df/servers/" + charServer + "/characters/"
+                                    + charId + "?zoom=2"
+                    let idurl = "https://cors-anywhere.herokuapp.com/https://api.neople.co.kr/df/servers/" + serverID(serName) + "/characters/" +
+                                    charId + "/status?apikey=u24sm4DgTGNKceFknyhar93DXxuHX9pN"
+
+
+
+
+                    $('#img-char').attr("src", charImg);
+
+                    $("#stat_table").show();
+
+                    $.ajax({
+                        type: "GET",
+                        url: idurl,
+                        data: {},
+                        success: (response) => {
+                            let charInfo2 = response;
+                            let status = response['status'];
+
+                            let charName = charInfo2['characterName'];
+                            let charClass = charInfo2['jobName'];
+                            let charJob = charInfo2['jobGrowName'];
+                            let charLevel = charInfo2['level'];
+                            let adventureName = charInfo2['adventureName'];
+                            let guildName = charInfo2['guildName'];
+
+                            let element = Math.max(status[23]['value'], status[25]['value'],
+                                status[27]['value'], status[29]['value'],);
+
+                            if (status[4]['value'] > status[5]['value']) {
+                                stat = status[4];
+                            } else {
+                                stat = status[5];
+                            }
+                            if (status[10]['value'] > status[11]['value']) {
+                                crit = status[10];
+                            } else {
+                                crit = status[11];
+                            }
+                            if (element === status[23]['value']) {
+                                element_attack = status[23];
+                            } else if (element === status[25]['value']) {
+                                element_attack = status[25];
+                            } else if (element === status[27]['value']) {
+                                element_attack = status[27];
+                            } else {
+                                element_attack = status[29];
+                            }
+// https://dundam.xyz/view.jsp?server=cain&name=%EC%95%95%EB%8F%84&image=0371060bc18b58a0da2a6f61f79f2e35
+                            let dundam_url = "https://dundam.xyz/view.jsp?server=" + serverID(serName) +
+                                                "&name=" + charEncode + "&image=" + charId
+                            let sirroco = "던파오프 크롤링 필요";
+                            let sandbag = "던파오프 크롤링 필요";
+
+
+                            let charInfo = `<tr><td>${charName}</td><td>${charClass}</td>
+                                            <td>${charJob}</td><td>${charLevel}</td>
+                                            <td>${adventureName}</td><td>${guildName}</td></tr>`
+
+                            let charStat = `<tr>
+                                            <td>${stat['name']} ${stat['value']}</td>
+                                            <td>${crit['name'][0]}${crit['name'][3]} ${crit['value']}</td>
+                                            <td>${element_attack['name'][0]}${element_attack['name'][1]}${element_attack['name'][4]} ${element_attack['value']}</td>
+                                            <td>${sirroco}</td>
+                                            <td>${sandbag}</td>
+                                            </tr>`
+
+                            $('#df-char').append(charInfo);
+                            $('#df-status').append(charStat);
+                        }
+                    })
+                }
+            })
+        }
+
+
+    </script>
+
+</head>
+<body>
+
+<h5>neople api test / by apdoros</h5>
+
+<hr/>
+
+<div class="background-center">
+    <h2>df 개발중</h2>
+
+<!--        <h3>서버 선택 <input type="text" id = "server-name"> </h3>-->
+    <div class="length-control">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="server-name">서버 선택</label>
+            </div>
+            <select class="custom-select" id="server-name">
+                <option selected>여기서 선택!</option>
+                <option value="1">카인</option>
+                <option value="2">디레지에</option>
+                <option value="3">시로코</option>
+                <option value="4">프레이</option>
+                <option value="5">카시야스</option>
+                <option value="6">힐더</option>
+                <option value="7">안톤</option>
+                <option value="8">바칼</option>
+            </select>
+        </div>
+    </div>
+
+<!--        <h3>캐릭터명 입력 <input type="text" id = "char-name"> </h3>-->
+    <div class = length-control>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">캐릭터명 입력</span>
+            </div>
+            <input type="text" class="form-control" placeholder="여기에 입력!" aria-label="여기에 입력!"
+                   aria-describedby="char-name" id="char-name">
+        </div>
+    </div>
+
+<!--    캐릭 정보를 불러오기 위한 버튼-->
+    <button type="button" onclick="showCharInfo()" class="btn btn-info" id = "btn-post-info">캐릭터 정보 검색</button>
+
+<!--    캐릭 조회 기능들-->
+    </p>
+    <div id = "stat_table" class = "background-center">
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">캐릭터명</th>
+                <th scope="col">직업</th>
+                <th scope="col">각성</th>
+                <th scope="col">레벨</th>
+                <th scope="col">모험단명</th>
+                <th scope="col">길드명</th>
+            </tr>
+            </thead>
+            <tbody id="df-char">
+            </tbody>
+        </table>
+
+        </p>
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">스탯</th>
+                <th scope="col">크리</th>
+                <th scope="col">속성</th>
+                <th scope="col">시로코딜</th>
+                <th scope="col">샌드백딜</th>
+            </tr>
+            </thead>
+            <tbody id="df-status">
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+    <img id="img-char" class = size-control src="https://developers.neople.co.kr/img/logo_t1.png" />
+    </div>
+</div>
+
+
+</body>
+</html>
