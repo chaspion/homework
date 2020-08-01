@@ -1,3 +1,4 @@
+import pymongo
 import requests
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
@@ -23,4 +24,12 @@ for epic in epics:
     channel = epic.select_one('span:nth-child(2) > i')
 
     if time and name and channel is not None:
-        print(time.text, name.text, channel.text)
+        epic_db = {
+            'time': time.text,
+            'name': name.text,
+            'channel': channel.text[:3],
+            'channel_name': channel.text[5:8]
+        }
+        db.epics.update(epic_db, epic_db, upsert=True)
+        print(time.text, name.text, channel.text[:3], channel.text[5:8])
+        # db.epics.delete_many({})
