@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>매운맛2</title>
+    <style>
+        h1, h5{
+            display: inline;
+        }
+        .background {
+            width: 30px;
+            height: 20px;
+        }
+        .middle {
+            text-align: center;
+        }
+        .left {
+            text-align: left;
+        }
+        .align{
+            margin: 10px auto;
+            width: 900px;
+        }
+        .draw-border{
+            border:5px solid black;
+            margin: 10px auto;
+            width: 1000px;
+            padding: 30px;
+        }
+        *{
+            font-family: 'Song Myung', serif;
+        }
+        .droplen {
+            width: 1000px;
+            color: deepskyblue;
+        }
+
+
+    </style>
+    <script>
+        function isCellPhone(p) {
+            let regExp = /^(010)[-][0-9]{4}[-][0-9]{4}$/;
+            return regExp.test(p);
+        }
+
+        $(document).ready(function exchangeRate() {
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: (response) => {
+                    let rateDollar = response[1]["rate"]
+                    let rateYen = response[2]["rate"]
+                    let wonDollar = `<h5>달러-원 환율: ${rateDollar}</h5></p>`
+                    let wonYen = `<h5>엔-원 환율: ${rateYen}</h5>`
+                    $('#currencyRate').append(wonDollar, wonYen)
+
+                }
+            })
+        })
+
+        function post_orders() {
+            let name = $('#customerName').val();
+            let count = $('#orderNum').val();
+            let address = $('#orderAddress').val();
+            let phone = $('#orderPhone').val();
+
+            if (name == '') {
+                alert('이름을 입력하시오');
+                $('#customerName').focus();
+            } else if (count == '') {
+                alert('수량을 입력하시오');
+                $('#orderNum').focus();
+            } else if (address == '') {
+                 alert('주소를 입력하시오');
+                $('#orderAddress').focus();
+            } else if (!isCellPhone(phone)) {
+                alert('전화번호를 010-0000-0000 형식으로 입력하시오');
+                $('#orderPhone').focus();
+            } else {
+                alert('주문완료!!')
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/order',
+                data: {name_give: name, count_give: count, address_give: address, phone_give: phone},
+                success: response => {
+                    if (response['result'] == 'success') {
+                        alert('주문성공');
+                        window.location.reload();
+                    } else {
+                        alert('주문실패!');
+                    }
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            $("#order-table").html("");
+            get_orders();
+        });
+
+        function get_orders() {
+            $.ajax({
+                type: 'GET',
+                url: '/order',
+                data:{},
+                success: response => {
+                    orders = response['orders'];
+                    for (i = 0; orders.length; i++) {
+                        let name = orders[i]['name'];
+                        let count = orders[i]['count'];
+                        let address = orders[i]['address'];
+                        let phone = orders[i]['phone'];
+
+                        let orderElement = `<tr>
+                                            <td>${name}</td>
+                                            <td>${count}</td>
+                                            <td>${address}</td>
+                                            <td>${phone}</td>
+                                            </tr>`;
+                        $('#order-table').append(orderElement);
+                    }
+                }
+            })
+        }
+
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Song+Myung&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="draw-border">
+    <div class ="middle">
+        <img src="https://i.ytimg.com/vi/6haRlYQ_x-I/maxresdefault.jpg" style="width: 800px;"/>
+    </div>
+
+
+    <div>
+        <p>
+        <h1>티코 판매중 </h1>
+        <h5 style="color: orangered">20만원</h5>
+        <h5>/ 5대</h5>
+        </p>
+        <p>
+        <h5>생각만해도 가슴이 웅장해지는 살아있는 대한민국 자동차 역사의 전설 '티코' 팝니다.</h5>
+        </p>
+    </div>
+
+    <div id = "currencyRate" style="color: indianred">
+    </div>
+
+    <div>
+        <p>
+            <h1>주문하기</h1>
+        </p>
+        <p>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text">주문자 이름: </span>
+            </div>
+            <input type="text" class = "droplen" id = "customerName">
+        </div>
+        </p>
+        <p>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text">수량: </span>
+            </div>
+            <select id = "orderNum" class = "droplen">
+                <option>선택</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="4">5</option>
+            </select>
+        </div>
+        </p>
+        <p>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text">주소: </span>
+            </div>
+            <input type="text" class="droplen" id = "orderAddress">
+        </div>
+        </p>
+        <p>
+        <div class="input-group flex-nowrap">
+            <div class="input-group-prepend">
+                <span class="input-group-text">전화번호: </span>
+            </div>
+            <input type="text" class = "droplen" id = "orderPhone">
+        </div>
+        </p>
+
+    <div class="middle">
+        <p>
+            <button type="button" class="btn btn-primary" onclick="post_orders()">주문하기</button>
+        </p>
+    </div>
+    <div class="orders">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">이름</th>
+                    <th scope="col">수량</th>
+                    <th scope="col">주소</th>
+                    <th scope="col">전화번호</th>
+                </tr>
+            </thead>
+            <tbody id = 'order-table'>
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+</body>
+</html>
