@@ -11,7 +11,7 @@ db = client.dbsparta
 #
 # data = requests.get("http://df.nexon.com/df/info/equipment/view?id=v1czui", headers = headers)
 
-driver = webdriver.Chrome('C:/Users/YH/Documents/chromedriver.exe')
+driver = webdriver.Chrome('chromedriver.exe')
 driver.get('https://dnf.akaib.com/')
 html = driver.page_source
 soup = BeautifulSoup(html, 'html.parser')
